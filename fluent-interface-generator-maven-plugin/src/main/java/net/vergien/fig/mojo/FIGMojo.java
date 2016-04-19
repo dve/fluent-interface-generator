@@ -1,17 +1,3 @@
-package net.vergien.fig.mojo;
-
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import org.apache.maven.artifact.DependencyResolutionRequiredException;
-
 /*
  * Copyright 2016 Daniel Nordhoff-Vergien.
  *
@@ -27,6 +13,11 @@ import org.apache.maven.artifact.DependencyResolutionRequiredException;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package net.vergien.fig.mojo;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
