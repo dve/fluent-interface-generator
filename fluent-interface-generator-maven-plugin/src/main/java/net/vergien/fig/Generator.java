@@ -57,9 +57,6 @@ public class Generator {
 		Set<MethodSpec> withMethodSpecs = new HashSet<MethodSpec>();
 		System.out.println("class: " + sourceClass.getName());
 		for (Method sourceMethod : sourceClass.getMethods()) {
-			System.out.println("method: " + sourceMethod.toString());
-			System.out.println("declaring class: " + sourceMethod.getDeclaringClass());
-			System.out.println("is syntetic: " + sourceMethod.isSynthetic());
 			if (!sourceMethod.isBridge() && isSetter(sourceMethod)) {
 				withMethodSpecs.add(createWithMethodSpec(sourceMethod, targetPackage + "." + targetClassName));
 			}
