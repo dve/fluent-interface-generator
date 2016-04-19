@@ -17,6 +17,8 @@ package net.vergien.fig.mojo;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -50,7 +52,11 @@ public class FIGMojo extends AbstractMojo {
 	 */
 	@Parameter(required = true)
 	private List<PkgConf> mapping;
-
+	/**
+	 * Prefixes for methods which should be converted to fluent-api style with*
+	 * methods
+	 */
+	private List<String> methodPrefixes = new ArrayList<>(Arrays.asList("add", "set"));
 	/**
 	 * The prefix for the abstract generated interim classes. Defaults to "A"
 	 */
@@ -72,13 +78,13 @@ public class FIGMojo extends AbstractMojo {
 
 		getLog().info("Prefix for generated abstract classes: " + abstractPrefix);
 		getLog().info("Prefix for classes: " + prefix);
-		Generator generator = new Generator(targetDir, abstractPrefix, prefix);
+		Generator generator = new Generator(targetDir, abstractPrefix, prefix, methodPrefixes);
 		for (PkgConf targetPackage : mapping) {
 			for (String className : targetPackage.getClassNames()) {
 				getLog().info("Create class for: " + className);
 				try {
 					Class<?> sourceClass = Thread.currentThread().getContextClassLoader().loadClass(className);
-					generator.createFluentFor(sourceClass, targetPackage.getPkgName());
+					generator.createFluentFor(sourceClass, targetPackage.getPkgName(), targetPackage.getIgnoreMethods());
 				} catch (ClassNotFoundException e) {
 					throw new MojoExecutionException("Error creating file " + className, e);
 				} catch (IOException e) {

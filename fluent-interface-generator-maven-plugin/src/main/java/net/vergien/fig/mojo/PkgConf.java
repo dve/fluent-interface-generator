@@ -4,6 +4,7 @@ import java.util.List;
 
 public class PkgConf {
 	private String pkgName;
+	private List<String> ignoreMethods;
 	private List<String> classNames;
 
 	public String getPkgName() {
@@ -20,5 +21,13 @@ public class PkgConf {
 
 	public void setClassNames(List<String> classNames) {
 		this.classNames = classNames;
+	}
+
+	public List<String> getIgnoreMethods() {
+		return ignoreMethods;
+	}
+
+	public void setIgnoreMethods(List<String> ignoreMethods) {
+		this.ignoreMethods = ignoreMethods;
 	}
 }

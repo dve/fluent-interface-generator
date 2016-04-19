@@ -40,6 +40,9 @@
 							<mapping>
 								<pkgConf>
 									<pkgName>net.vergien.fig.example.beans.fluent</pkgName>
+									<ignoreMethods>
+										<param>setStyleName</param>
+									</ignoreMethods>
 									<classNames>
 										<param>net.vergien.fig.example.beans.Person</param>
 										<param>net.vergien.fig.example.beans.PhoneNumber</param>
