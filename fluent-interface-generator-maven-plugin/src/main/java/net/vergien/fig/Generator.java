@@ -88,8 +88,10 @@ public class Generator {
 		Set<MethodSpec> withMethodSpecs = new HashSet<MethodSpec>();
 
 		for (Method sourceMethod : sourceClass.getMethods()) {
+
 			if (!ignoreMethods.contains(sourceMethod.getName())) {
-				if (!(sourceMethod.isBridge() || sourceMethod.isSynthetic())) {
+				if (!(sourceMethod.isBridge() || sourceMethod.isSynthetic()
+						|| sourceMethod.isAnnotationPresent(Deprecated.class))) {
 					for (String prefix : methodPrefixes) {
 						if (sourceMethod.getName().startsWith(prefix)
 								&& sourceMethod.getReturnType().equals(Void.TYPE)) {
@@ -100,6 +102,7 @@ public class Generator {
 					}
 				}
 			}
+
 		}
 		return withMethodSpecs;
 	}
