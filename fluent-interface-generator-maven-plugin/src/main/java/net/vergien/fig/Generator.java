@@ -67,7 +67,7 @@ public class Generator {
 			}
 		}
 		AnnotationSpec generatedAnnotationSpec = AnnotationSpec.builder(Generated.class)
-				.addMember("value", "$S", this.getClass().toString()).build();
+				.addMember("value", "$S", this.getClass().getName()).build();
 		TypeSpec fluentClass = TypeSpec.classBuilder(fluentClassName).addAnnotation(generatedAnnotationSpec)
 				.addModifiers(Modifier.ABSTRACT, Modifier.PUBLIC).addMethods(constructorMehtodSpecs)
 				.addMethods(withMethodSpecs).superclass(sourceClass).build();
