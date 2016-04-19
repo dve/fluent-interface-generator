@@ -21,6 +21,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -54,8 +55,12 @@ public class Generator {
 		String targetClassName = prefix + sourceClass.getSimpleName();
 
 		Set<MethodSpec> withMethodSpecs = new HashSet<MethodSpec>();
+		System.out.println("class: " + sourceClass.getName());
 		for (Method sourceMethod : sourceClass.getMethods()) {
-			if (isSetter(sourceMethod)) {
+			System.out.println("method: " + sourceMethod.toString());
+			System.out.println("declaring class: " + sourceMethod.getDeclaringClass());
+			System.out.println("is syntetic: " + sourceMethod.isSynthetic());
+			if (!sourceMethod.isBridge() && isSetter(sourceMethod)) {
 				withMethodSpecs.add(createWithMethodSpec(sourceMethod, targetPackage + "." + targetClassName));
 			}
 		}
