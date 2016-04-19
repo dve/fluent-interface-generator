@@ -37,9 +37,15 @@
 						<configuration>
 							<abstractPrefix>F</abstractPrefix>
 							<prefix>M</prefix>
-							<classNames>
-								<param>net.vergien.fig.example.beans.Person</param>
-							</classNames>
+							<mapping>
+								<pkgConf>
+									<pkgName>net.vergien.fig.example.beans.fluent</pkgName>
+									<classNames>
+										<param>net.vergien.fig.example.beans.Person</param>
+										<param>net.vergien.fig.example.beans.PhoneNumber</param>
+									</classNames>
+								</pkgConf>
+							</mapping>
 						</configuration>
 					</execution>
 				</executions>

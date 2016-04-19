@@ -1,4 +1,4 @@
-package net.vergien.fig.example.beans;
+package net.vergien.fig.example.beans.fluent;
 
 public class MPerson extends FPerson {
 

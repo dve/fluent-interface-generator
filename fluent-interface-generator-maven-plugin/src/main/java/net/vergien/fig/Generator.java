@@ -49,9 +49,7 @@ public class Generator {
 		this.prefix = prefix;
 	}
 
-	public void createFluentFor(Class<?> sourceClass) throws ClassNotFoundException, IOException {
-
-		String targetPackage = sourceClass.getPackage().getName();
+	public void createFluentFor(Class<?> sourceClass, String targetPackage) throws ClassNotFoundException, IOException {
 		String fluentClassName = abstractPrefix + sourceClass.getSimpleName();
 		String targetClassName = prefix + sourceClass.getSimpleName();
 

@@ -18,6 +18,7 @@ package net.vergien.fig.mojo;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -48,7 +49,7 @@ public class FIGMojo extends AbstractMojo {
 	 * version should be created.
 	 */
 	@Parameter(required = true)
-	private List<String> classNames;
+	private List<PkgConf> mapping;
 
 	/**
 	 * The prefix for the abstract generated interim classes. Defaults to "A"
@@ -72,15 +73,17 @@ public class FIGMojo extends AbstractMojo {
 		getLog().info("Prefix for generated abstract classes: " + abstractPrefix);
 		getLog().info("Prefix for classes: " + prefix);
 		Generator generator = new Generator(targetDir, abstractPrefix, prefix);
-		for (String className : classNames) {
-			getLog().info("Create class for: " + className);
-			try {
-				Class<?> sourceClass = Thread.currentThread().getContextClassLoader().loadClass(className);
-				generator.createFluentFor(sourceClass);
-			} catch (ClassNotFoundException e) {
-				throw new MojoExecutionException("Error creating file " + className, e);
-			} catch (IOException e) {
-				throw new MojoExecutionException("Error creating file " + className, e);
+		for (PkgConf targetPackage : mapping) {
+			for (String className : targetPackage.getClassNames()) {
+				getLog().info("Create class for: " + className);
+				try {
+					Class<?> sourceClass = Thread.currentThread().getContextClassLoader().loadClass(className);
+					generator.createFluentFor(sourceClass, targetPackage.getPkgName());
+				} catch (ClassNotFoundException e) {
+					throw new MojoExecutionException("Error creating file " + className, e);
+				} catch (IOException e) {
+					throw new MojoExecutionException("Error creating file " + className, e);
+				}
 			}
 		}
 	}
