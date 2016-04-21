@@ -63,11 +63,17 @@ public class FIGMojo extends AbstractMojo {
 	@Parameter(defaultValue = "A", required = true)
 	private String abstractPrefix;
 	/**
+	 * The prefix for the documentation interface. Defaults to "I"
+	 */
+	@Parameter(defaultValue = "I", required = true)
+	private String interfacePrefix;
+	/**
 	 * The prefix for the classes. Defaults to "F"
 	 */
 	@Parameter(defaultValue = "F", required = true)
 	private String prefix;
 
+	@Override
 	public void execute() throws MojoExecutionException {
 
 		File targetDir = new File(outputDirectory, "generated-sources/fluent-interface-generator-maven-plugin");
@@ -77,8 +83,9 @@ public class FIGMojo extends AbstractMojo {
 		}
 
 		getLog().info("Prefix for generated abstract classes: " + abstractPrefix);
+		getLog().info("Prefix for interfaces: " + interfacePrefix);
 		getLog().info("Prefix for classes: " + prefix);
-		Generator generator = new Generator(targetDir, abstractPrefix, prefix, methodPrefixes);
+		Generator generator = new Generator(targetDir, abstractPrefix, interfacePrefix, prefix, methodPrefixes);
 		for (PkgConf targetPackage : mapping) {
 			for (String className : targetPackage.getClassNames()) {
 				getLog().info("Create class for: " + className);
