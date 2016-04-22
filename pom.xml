@@ -17,4 +17,22 @@
 		<module>fluent-interface-generator-example-beans</module>
 		<module>fluent-interface-generator-example</module>
 	</modules>
+	<url>https://github.com/dve/fluent-interface-generator</url>
+	<scm>
+		<url>https://github.com/dve/fluent-interface-generator.git</url>
+	</scm>
+	<description>A generator for fluent interfaces for java beans</description>
+	<licenses>
+		<license>
+			<name>Apache License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+		</license>
+	</licenses>
+	<developers>
+		<developer>
+			<name>Daniel Nordhoff-Vergien</name>
+			<email>fig@vergien.net</email>
+			<organizationUrl>https://github.com/dve/</organizationUrl>
+		</developer>
+	</developers>
 </project>
