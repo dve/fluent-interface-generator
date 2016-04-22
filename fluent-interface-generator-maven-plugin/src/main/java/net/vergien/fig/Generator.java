@@ -38,6 +38,7 @@ import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.TypeSpec;
+import org.apache.maven.plugin.logging.Log;
 
 public class Generator {
 
@@ -46,8 +47,10 @@ public class Generator {
 	private String interfacePrefix;
 	private String prefix;
 	private List<String> methodPrefixes;
+	private Log log;
 
-	public Generator(File targetDir, String abstractPrefix, String interfacePrefix, String prefix, List<String> methodPrefixes) {
+	public Generator(Log log, File targetDir, String abstractPrefix, String interfacePrefix, String prefix, List<String> methodPrefixes) {
+		this.log = log;
 		this.targetDir = targetDir;
 		this.abstractPrefix = abstractPrefix;
 		this.interfacePrefix = interfacePrefix;
@@ -62,11 +65,14 @@ public class Generator {
 		});
 	}
 
-	public void createFluentFor(Class<?> sourceClass, String targetPackage, List<String> ignoreMethods)
+	public void createFluentFor(Class<?> sourceClass, String targetPackage, List<String> ignoreMethods, String interfaceTargetPackage)
 			throws ClassNotFoundException, IOException {
 		String fluentClassName = abstractPrefix + sourceClass.getSimpleName();
 		
-		Class<?> interfaceClass = createInterfaceClass(sourceClass, targetPackage);
+		if (interfaceTargetPackage == null) {
+			interfaceTargetPackage = targetPackage;
+		}
+		Class<?> interfaceClass = createInterfaceClass(sourceClass, interfaceTargetPackage);
 
 		Set<MethodSpec> withMethodSpecs = createMethodSpecs(sourceClass, targetPackage, ignoreMethods, interfaceClass);
 
@@ -92,20 +98,21 @@ public class Generator {
 	}
 	
 	private Class<?> createInterfaceClass(Class<?> sourceClass, String targetPackage) {
-		String interfaceClassName = interfacePrefix + sourceClass.getSimpleName();
+		String interfaceClassNameSimple = interfacePrefix + sourceClass.getSimpleName();
+		String interfaceClassName = targetPackage + "." + interfaceClassNameSimple;
 		Class<?> interfaceClass;
 		try {
-			System.out.println(targetPackage + "." + interfaceClassName);
-			interfaceClass = Class.forName(targetPackage + "." + interfaceClassName);
+			log.debug("Search for interface " + interfaceClassName);
+			interfaceClass = Thread.currentThread().getContextClassLoader().loadClass(interfaceClassName);
 		} catch (ClassNotFoundException ex) {
-			System.out.println("ClassNotFoundException ex");
+			log.debug("Interface " + interfaceClassName + " not found");
 			return null;
 		}
 		if (!interfaceClass.isInterface()) {
-			System.out.println("!interfaceClass.isInterface()");
+			log.debug("Interface " + interfaceClassName + " not an interface!");
 			return null;
 		}
-		System.out.println(interfaceClass);
+		log.info("Found interface " + interfaceClassName);
 		return interfaceClass;
 	}
 
