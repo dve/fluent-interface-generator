@@ -123,12 +123,16 @@ public class Generator {
 		String methodName = "with" + setter.getName().substring(prefix.length());
 
 		List<ParameterSpec> parameters = createParameterSpecs(setter.getParameters());
+		boolean varargs = false;
+		if (!parameters.isEmpty()) {
+			varargs = setter.getParameters()[parameters.size()-1].isVarArgs();
+		}
 		List<String> parameterNames = new ArrayList<String>();
 		for (ParameterSpec parameterSpec : parameters) {
 			parameterNames.add(parameterSpec.name);
 		}
 		ClassName bestGuess = ClassName.bestGuess(targetType);
-		return MethodSpec.methodBuilder(methodName).addModifiers(Modifier.PUBLIC).addParameters(parameters)
+		return MethodSpec.methodBuilder(methodName).addModifiers(Modifier.PUBLIC).addParameters(parameters).varargs(varargs)
 				.addStatement(
 						"this." + setter.getName() + "(" + StringUtils.join(parameterNames.iterator(), ", ") + ")")
 				.addStatement("return ($T) this", bestGuess).returns(bestGuess).build();

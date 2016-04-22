@@ -22,6 +22,12 @@ public class Field extends AbstractBean implements IField<String> {
 		styleNames.add(styleName);
 	}
 
+	public void addStyleName(String... styleNames) {
+		for (String styleName : styleNames) {
+			addStyleName(styleName);
+		}
+	}
+
 	public void setO(Integer o) {
 		super.setO(o);
 	}
