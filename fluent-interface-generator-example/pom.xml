@@ -4,9 +4,9 @@
 	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>net.vergien</groupId>
+		<groupId>net.vergien.fig</groupId>
 		<artifactId>fluent-interface-generator-parent</artifactId>
-		<version>1.0-SNAPSHOT</version>
+		<version>0.0.1-SNAPSHOT</version>
 	</parent>
 	<artifactId>fluent-interface-generator-example</artifactId>
 	<name>fluent-interface-generator-example</name>
@@ -22,7 +22,7 @@
 				<version>${project.version}</version>
 				<dependencies>
 					<dependency>
-						<groupId>net.vergien</groupId>
+						<groupId>${project.groupId}</groupId>
 						<artifactId>fluent-interface-generator-example-beans</artifactId>
 						<version>${project.version}</version>
 					</dependency>
@@ -64,7 +64,7 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>net.vergien</groupId>
+			<groupId>${project.groupId}</groupId>
 			<artifactId>fluent-interface-generator-example-beans</artifactId>
 			<version>${project.version}</version>
 		</dependency>
