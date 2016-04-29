@@ -6,7 +6,8 @@ public class PkgConf {
 	private String pkgName;
 	private List<String> ignoreMethods;
 	private List<String> classNames;
-
+	private String interfacePkgName;
+	
 	public String getPkgName() {
 		return pkgName;
 	}
@@ -30,4 +31,13 @@ public class PkgConf {
 	public void setIgnoreMethods(List<String> ignoreMethods) {
 		this.ignoreMethods = ignoreMethods;
 	}
+
+	public String getInterfacePkgName() {
+		return interfacePkgName;
+	}
+
+	public void setInterfacePkgName(String interfacePkgName) {
+		this.interfacePkgName = interfacePkgName;
+	}
+	
 }
