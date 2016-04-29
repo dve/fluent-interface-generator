@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>fluent-interface-generator-parent</artifactId>
 		<groupId>net.vergien.fig</groupId>
-		<version>0.0.2</version>
+		<version>0.0.3-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>fluent-interface-generator-maven-plugin</artifactId>
