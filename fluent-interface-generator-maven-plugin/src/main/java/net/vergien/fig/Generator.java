@@ -137,8 +137,6 @@ public class Generator {
 			log.debug("rawType: " + rawType.toString());
 			log.debug("pType.getActualTypeArguements: " + Arrays.toString(pType.getActualTypeArguments()));
 			log.debug("rawTypeClass.getTypedParamters: " + Arrays.toString(rawTypeClass.getTypeParameters()));
-			Type[] actualTypes = pType.getActualTypeArguments();
-			System.out.println(actualTypes);
 			int i = 0;
 			for (TypeVariable<?> typeVariable : rawTypeClass.getTypeParameters()) {
 				typeMapping.put(typeVariable.getName(), pType.getActualTypeArguments()[i]);
