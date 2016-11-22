@@ -17,6 +17,12 @@ public class TestFField extends TestCase {
 	}
 
 	@Test
+	public void testWithValue() {
+		fieldUnderTest.withValue("Test");
+		
+		assertThat(fieldUnderTest.getValue(), is("Test"));
+	}
+	@Test
 	public void testWithStyleName() {
 		fieldUnderTest.withStyleName("Test").withStyleName("Test2");
 

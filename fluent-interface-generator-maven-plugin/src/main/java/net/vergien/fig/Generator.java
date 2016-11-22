@@ -20,16 +20,23 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.Generated;
 import javax.lang.model.element.Modifier;
 
+import org.apache.maven.plugin.logging.Log;
 import org.codehaus.plexus.util.StringUtils;
 
 import com.squareup.javapoet.AnnotationSpec;
@@ -38,7 +45,6 @@ import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.TypeSpec;
-import org.apache.maven.plugin.logging.Log;
 
 public class Generator {
 
@@ -49,7 +55,8 @@ public class Generator {
 	private List<String> methodPrefixes;
 	private Log log;
 
-	public Generator(Log log, File targetDir, String abstractPrefix, String interfacePrefix, String prefix, List<String> methodPrefixes) {
+	public Generator(Log log, File targetDir, String abstractPrefix, String interfacePrefix, String prefix,
+			List<String> methodPrefixes) {
 		this.log = log;
 		this.targetDir = targetDir;
 		this.abstractPrefix = abstractPrefix;
@@ -65,10 +72,10 @@ public class Generator {
 		});
 	}
 
-	public void createFluentFor(Class<?> sourceClass, String targetPackage, List<String> ignoreMethods, String interfaceTargetPackage)
-			throws ClassNotFoundException, IOException {
+	public void createFluentFor(Class<?> sourceClass, String targetPackage, List<String> ignoreMethods,
+			String interfaceTargetPackage) throws ClassNotFoundException, IOException {
 		String fluentClassName = abstractPrefix + sourceClass.getSimpleName();
-		
+
 		if (interfaceTargetPackage == null) {
 			interfaceTargetPackage = targetPackage;
 		}
@@ -96,7 +103,7 @@ public class Generator {
 
 		fluentFile.writeTo(targetDir);
 	}
-	
+
 	private Class<?> createInterfaceClass(Class<?> sourceClass, String targetPackage) {
 		String interfaceClassNameSimple = interfacePrefix + sourceClass.getSimpleName();
 		String interfaceClassName = targetPackage + "." + interfaceClassNameSimple;
@@ -116,20 +123,42 @@ public class Generator {
 		return interfaceClass;
 	}
 
-	private Set<MethodSpec> createMethodSpecs(Class<?> sourceClass, String targetPackage, List<String> ignoreMethods, Class<?> interfaceClass) {
+	protected Set<MethodSpec> createMethodSpecs(Class<?> sourceClass, String targetPackage, List<String> ignoreMethods,
+			Class<?> interfaceClass) {
 		String targetClassName = prefix + sourceClass.getSimpleName();
 		Set<MethodSpec> withMethodSpecs = new HashSet<>();
+		Type type = sourceClass.getGenericSuperclass();
+		Map<String, Type> typeMapping = new HashMap<>();
+		if (type instanceof ParameterizedType) {
+			ParameterizedType pType = (ParameterizedType) type;
+			Type rawType = pType.getRawType();
+			Class rawTypeClass = (Class) rawType;
+
+			log.debug("rawType: " + rawType.toString());
+			log.debug("pType.getActualTypeArguements: " + Arrays.toString(pType.getActualTypeArguments()));
+			log.debug("rawTypeClass.getTypedParamters: " + Arrays.toString(rawTypeClass.getTypeParameters()));
+			Type[] actualTypes = pType.getActualTypeArguments();
+			System.out.println(actualTypes);
+			int i = 0;
+			for (TypeVariable<?> typeVariable : rawTypeClass.getTypeParameters()) {
+				typeMapping.put(typeVariable.getName(), pType.getActualTypeArguments()[i]);
+				i++;
+			}
+		}
+		log.debug("Methods of " + sourceClass.getName() + ":");
 
 		for (Method sourceMethod : sourceClass.getMethods()) {
-
+			log.debug("\tsourceMethod: " + sourceMethod);
+			log.debug("\t" + Arrays.toString(sourceMethod.getGenericParameterTypes()));
 			if (!ignoreMethods.contains(sourceMethod.getName())) {
 				if (!(sourceMethod.isBridge() || sourceMethod.isSynthetic()
 						|| sourceMethod.isAnnotationPresent(Deprecated.class))) {
 					for (String methodPrefix : methodPrefixes) {
 						if (sourceMethod.getName().startsWith(methodPrefix)
 								&& sourceMethod.getReturnType().equals(Void.TYPE)) {
-							withMethodSpecs.add(
-									createWithMethodSpec(sourceMethod, targetPackage + "." + targetClassName, methodPrefix, sourceClass, interfaceClass));
+							withMethodSpecs
+									.add(createWithMethodSpec(sourceMethod, targetPackage + "." + targetClassName,
+											methodPrefix, sourceClass, interfaceClass, typeMapping));
 							break;
 						}
 					}
@@ -141,7 +170,7 @@ public class Generator {
 	}
 
 	private MethodSpec createConstructorMethodSpec(Constructor<?> constructor) {
-		List<ParameterSpec> parameterSpecs = createParameterSpecs(constructor.getParameters());
+		List<ParameterSpec> parameterSpecs = createParameterSpecs(constructor.getParameters(), new Type[0], null);
 		List<String> parameterNames = new ArrayList<>();
 		for (ParameterSpec parameterSpec : parameterSpecs) {
 			parameterNames.add(parameterSpec.name);
@@ -152,26 +181,28 @@ public class Generator {
 		return constructorSpec;
 	}
 
-	private MethodSpec createWithMethodSpec(Method setter, String targetType, String prefix, Class<?> sourceClass, Class<?> interfaceClass) {
+	private MethodSpec createWithMethodSpec(Method setter, String targetType, String prefix, Class<?> sourceClass,
+			Class<?> interfaceClass, Map<String, Type> typeMapping) {
 		String methodName = "with" + setter.getName().substring(prefix.length());
 
-		List<ParameterSpec> parameters = createParameterSpecs(setter.getParameters());
+		List<ParameterSpec> parameters = createParameterSpecs(setter.getParameters(), setter.getGenericParameterTypes(),
+				typeMapping);
 		boolean varargs = false;
 		if (!parameters.isEmpty()) {
-			varargs = setter.getParameters()[parameters.size()-1].isVarArgs();
+			varargs = setter.getParameters()[parameters.size() - 1].isVarArgs();
 		}
 		List<String> parameterNames = new ArrayList<String>();
 		for (ParameterSpec parameterSpec : parameters) {
 			parameterNames.add(parameterSpec.name);
 		}
 		ClassName bestGuess = ClassName.bestGuess(targetType);
-		
-		MethodSpec.Builder builder = MethodSpec.methodBuilder(methodName)
-				.addModifiers(Modifier.PUBLIC).addParameters(parameters)
-				.addStatement("this." + setter.getName() + "(" + StringUtils.join(parameterNames.iterator(), ", ") + ")")
-				.addStatement("return ($T) this", bestGuess)
-				.returns(bestGuess);
-		if(varargs) {
+
+		MethodSpec.Builder builder = MethodSpec.methodBuilder(methodName).addModifiers(Modifier.PUBLIC)
+				.addParameters(parameters)
+				.addStatement(
+						"this." + setter.getName() + "(" + StringUtils.join(parameterNames.iterator(), ", ") + ")")
+				.addStatement("return ($T) this", bestGuess).returns(bestGuess);
+		if (varargs) {
 			builder.varargs(true);
 		}
 		if (hasMethod(sourceClass, methodName, setter.getParameterTypes())) {
@@ -181,23 +212,30 @@ public class Generator {
 				builder.addAnnotation(Override.class);
 			}
 		}
-		
+
 		return builder.build();
 	}
 
-	private List<ParameterSpec> createParameterSpecs(Parameter[] parameters) {
+	private List<ParameterSpec> createParameterSpecs(Parameter[] parameters, Type[] genericParameters,
+			Map<String, Type> typeMapping) {
 		List<ParameterSpec> specs = new ArrayList<>();
-		for (Parameter parameter : parameters) {
-			specs.add(ParameterSpec.builder(parameter.getType(), parameter.getName()).build());
+		for (int i = 0; i < parameters.length; i++) {
+			Parameter parameter = parameters[i];
+			Type type = parameter.getType();
+			if (typeMapping != null && typeMapping.containsKey(parameter.getParameterizedType().getTypeName())) {
+				type = typeMapping.get(parameter.getParameterizedType().getTypeName());
+			}
+			specs.add(ParameterSpec.builder(type, parameter.getName()).build());
 		}
+
 		return specs;
 	}
 
 	private boolean isSetter(Method method) {
 		return method.getName().startsWith("set") && method.getReturnType().equals(Void.TYPE);
 	}
-	
-	private boolean hasMethod(Class<?> type, String name, Class<?>...parameterTypes) {
+
+	private boolean hasMethod(Class<?> type, String name, Class<?>... parameterTypes) {
 		try {
 			type.getMethod(name, parameterTypes);
 		} catch (NoSuchMethodException ex) {

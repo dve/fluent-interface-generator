@@ -44,6 +44,7 @@
 										<param>net.vergien.fig.example.beans.Person</param>
 										<param>net.vergien.fig.example.beans.PhoneNumber</param>
 										<param>net.vergien.fig.example.beans.Field</param>
+										<param>net.vergien.fig.example.beans.DateField</param>
 									</classNames>
 								</pkgConf>
 							</mapping>
