@@ -146,23 +146,34 @@ public class Generator {
 		for (Method sourceMethod : sourceClass.getMethods()) {
 			log.debug("\tsourceMethod: " + sourceMethod);
 			log.debug("\t" + Arrays.toString(sourceMethod.getGenericParameterTypes()));
-			if (!ignoreMethods.contains(sourceMethod.getName())) {
-				if (!(sourceMethod.isBridge() || sourceMethod.isSynthetic()
-						|| sourceMethod.isAnnotationPresent(Deprecated.class))) {
-					for (String methodPrefix : methodPrefixes) {
-						if (sourceMethod.getName().startsWith(methodPrefix)
-								&& sourceMethod.getReturnType().equals(Void.TYPE)) {
-							withMethodSpecs
-									.add(createWithMethodSpec(sourceMethod, targetPackage + "." + targetClassName,
-											methodPrefix, sourceClass, interfaceClass, typeMapping));
-							break;
-						}
+			if (methodIsNotIgnored(ignoreMethods, sourceMethod) && methodIsNotCompilerGenerated(sourceMethod)
+					&& methodIsNotDeprecated(sourceMethod)) {
+				for (String methodPrefix : methodPrefixes) {
+					if (methodIsSetter(sourceMethod, methodPrefix)) {
+						withMethodSpecs.add(createWithMethodSpec(sourceMethod, targetPackage + "." + targetClassName,
+								methodPrefix, sourceClass, interfaceClass, typeMapping));
+						break;
 					}
 				}
 			}
-
 		}
 		return withMethodSpecs;
+	}
+
+	private boolean methodIsSetter(Method sourceMethod, String methodPrefix) {
+		return sourceMethod.getName().startsWith(methodPrefix) && sourceMethod.getReturnType().equals(Void.TYPE);
+	}
+
+	private boolean methodIsNotDeprecated(Method sourceMethod) {
+		return !sourceMethod.isAnnotationPresent(Deprecated.class);
+	}
+
+	private boolean methodIsNotCompilerGenerated(Method sourceMethod) {
+		return !(sourceMethod.isBridge() || sourceMethod.isSynthetic());
+	}
+
+	private boolean methodIsNotIgnored(List<String> ignoreMethods, Method sourceMethod) {
+		return !ignoreMethods.contains(sourceMethod.getName());
 	}
 
 	private MethodSpec createConstructorMethodSpec(Constructor<?> constructor) {
