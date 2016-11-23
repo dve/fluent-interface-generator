@@ -76,10 +76,8 @@ public class Generator {
 			String interfaceTargetPackage) throws ClassNotFoundException, IOException {
 		String fluentClassName = abstractPrefix + sourceClass.getSimpleName();
 
-		if (interfaceTargetPackage == null) {
-			interfaceTargetPackage = targetPackage;
-		}
-		Class<?> interfaceClass = createInterfaceClass(sourceClass, interfaceTargetPackage);
+		Class<?> interfaceClass = createInterfaceClass(sourceClass,
+				interfaceTargetPackage == null ? targetPackage : interfaceTargetPackage);
 
 		Set<MethodSpec> withMethodSpecs = createMethodSpecs(sourceClass, targetPackage, ignoreMethods, interfaceClass);
 
