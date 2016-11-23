@@ -229,10 +229,6 @@ public class Generator {
 		return specs;
 	}
 
-	private boolean isSetter(Method method) {
-		return method.getName().startsWith("set") && method.getReturnType().equals(Void.TYPE);
-	}
-
 	private boolean hasMethod(Class<?> type, String name, Class<?>... parameterTypes) {
 		try {
 			type.getMethod(name, parameterTypes);
