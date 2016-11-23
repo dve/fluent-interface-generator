@@ -166,7 +166,7 @@ public class Generator {
 	}
 
 	private MethodSpec createConstructorMethodSpec(Constructor<?> constructor) {
-		List<ParameterSpec> parameterSpecs = createParameterSpecs(constructor.getParameters(), new Type[0], null);
+		List<ParameterSpec> parameterSpecs = createParameterSpecs(constructor.getParameters(), null);
 		List<String> parameterNames = new ArrayList<>();
 		for (ParameterSpec parameterSpec : parameterSpecs) {
 			parameterNames.add(parameterSpec.name);
@@ -181,8 +181,7 @@ public class Generator {
 			Class<?> interfaceClass, Map<String, Type> typeMapping) {
 		String methodName = "with" + setter.getName().substring(prefix.length());
 
-		List<ParameterSpec> parameters = createParameterSpecs(setter.getParameters(), setter.getGenericParameterTypes(),
-				typeMapping);
+		List<ParameterSpec> parameters = createParameterSpecs(setter.getParameters(), typeMapping);
 		boolean varargs = false;
 		if (!parameters.isEmpty()) {
 			varargs = setter.getParameters()[parameters.size() - 1].isVarArgs();
@@ -212,8 +211,7 @@ public class Generator {
 		return builder.build();
 	}
 
-	private List<ParameterSpec> createParameterSpecs(Parameter[] parameters, Type[] genericParameters,
-			Map<String, Type> typeMapping) {
+	private List<ParameterSpec> createParameterSpecs(Parameter[] parameters, Map<String, Type> typeMapping) {
 		List<ParameterSpec> specs = new ArrayList<>();
 		for (int i = 0; i < parameters.length; i++) {
 			Parameter parameter = parameters[i];
