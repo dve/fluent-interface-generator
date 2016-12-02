@@ -6,7 +6,8 @@ import java.util.List;
 public class Field extends AbstractBean implements IField<String> {
 	private String value;
 	private List<String> styleNames = new ArrayList<>();
-
+	private int size = 0;
+	
 	@Override
 	public void setValue(String value) {
 		this.value = value;
@@ -38,5 +39,17 @@ public class Field extends AbstractBean implements IField<String> {
 
 	public List<String> getStyleNames() {
 		return styleNames;
-	};
+	}
+	
+	public void setSize(int size) {
+		this.size = size;
+	}
+	
+	public int getSize() {
+		return size;
+	}
+	
+	public void setSizeFull() {
+		setSize(100);
+	}
 }

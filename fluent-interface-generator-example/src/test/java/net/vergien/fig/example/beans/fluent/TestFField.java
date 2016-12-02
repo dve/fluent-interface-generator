@@ -39,4 +39,11 @@ public class TestFField extends TestCase {
 		assertThat(fieldUnderTest.getStyleNames().contains("Test"), is(true));
 		assertThat(fieldUnderTest.getStyleNames().contains("Test2"), is(true));
 	}
+	
+	@Test
+	public void testWithFullSize(){
+		fieldUnderTest.withFullSize();
+		
+		assertThat(fieldUnderTest.getSize(), is(100));
+	}
 }

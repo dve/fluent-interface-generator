@@ -23,6 +23,7 @@ import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -76,6 +77,9 @@ public class FIGMojo extends AbstractMojo {
 	@Parameter(defaultValue = "F", required = true)
 	private String prefix;
 
+	@Parameter
+	private Map<String, String> methodNameMappings;
+	
 	@Override
 	public void execute() throws MojoExecutionException {
 		
@@ -91,7 +95,7 @@ public class FIGMojo extends AbstractMojo {
 		getLog().info("Prefix for generated abstract classes: " + abstractPrefix);
 		getLog().info("Prefix for interfaces: " + interfacePrefix);
 		getLog().info("Prefix for classes: " + prefix);
-		Generator generator = new Generator(getLog(), targetDir, abstractPrefix, interfacePrefix, prefix, methodPrefixes);
+		Generator generator = new Generator(getLog(), targetDir, abstractPrefix, interfacePrefix, prefix, methodPrefixes, methodNameMappings);
 		for (PkgConf targetPackage : mapping) {
 			for (String className : targetPackage.getClassNames()) {
 				getLog().info("Create class for: " + className);

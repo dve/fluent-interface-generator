@@ -53,16 +53,22 @@ public class Generator {
 	private String interfacePrefix;
 	private String prefix;
 	private List<String> methodPrefixes;
+	private Map<String, String> methodNameMappings;
 	private Log log;
 
 	public Generator(Log log, File targetDir, String abstractPrefix, String interfacePrefix, String prefix,
-			List<String> methodPrefixes) {
+			List<String> methodPrefixes, Map<String, String> methodNameMappings) {
 		this.log = log;
 		this.targetDir = targetDir;
 		this.abstractPrefix = abstractPrefix;
 		this.interfacePrefix = interfacePrefix;
 		this.prefix = prefix;
 		this.methodPrefixes = new ArrayList<>(methodPrefixes);
+		if (methodNameMappings != null) {
+			this.methodNameMappings = new HashMap<>(methodNameMappings);
+		} else {
+			this.methodNameMappings = new HashMap<>();
+		}
 		Collections.sort(this.methodPrefixes, new Comparator<String>() {
 
 			@Override
@@ -191,7 +197,9 @@ public class Generator {
 	private MethodSpec createWithMethodSpec(Method setter, String targetType, String prefix, Class<?> sourceClass,
 			Class<?> interfaceClass, Map<String, Type> typeMapping) {
 		String methodName = "with" + setter.getName().substring(prefix.length());
-
+		if (methodNameMappings.containsKey(methodName)) {
+			methodName = methodNameMappings.get(methodName);
+		}
 		List<ParameterSpec> parameters = createParameterSpecs(setter.getParameters(), typeMapping);
 		boolean varargs = false;
 		if (!parameters.isEmpty()) {
