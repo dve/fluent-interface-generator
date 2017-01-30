@@ -119,7 +119,6 @@ public class FIGMojo extends AbstractMojo {
 		URL outputURL = null;
 		try {
 			outputURL = new File(outputDirectory, "classes").toURI().toURL();
-			System.out.println(outputURL);
 		} catch (MalformedURLException e) {
 			throw new RuntimeException(e);
 		}
